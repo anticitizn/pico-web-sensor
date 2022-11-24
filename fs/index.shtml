@@ -1,0 +1,20 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>PicoWebSensor</title>
+<meta http-equiv="refresh" content ="1">
+</head>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+<body>
+
+<h2>Temperature sensor readout: <!--#adc --></h2>
+
+<p>This page refreshes every 1 second.</p>
+
+</body>
+</html>
