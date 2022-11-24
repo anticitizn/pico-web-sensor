@@ -73,15 +73,17 @@ int main()
     multicore_launch_core1(core1_entry);
 
     int LED_SENSOR = 26;
+    
+    stdio_init_all();
     adc_init();
     adc_gpio_init(LED_SENSOR);
     adc_select_input(0);
 
     const float conversion_factor = 3.3f / (1 << 12);
-    while (1)
+    while (true)
     {
         uint16_t result = adc_read();
-        temp = result * conversion_factor;
+        temp = 100 * (result * conversion_factor) - 50;
         sleep_ms(1000);
     }
 
