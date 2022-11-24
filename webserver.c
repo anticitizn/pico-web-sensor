@@ -25,14 +25,15 @@ static const char *cgi_reset_usb_boot(int iIndex, int iNumParams, char *pcParam[
     return "/index.shtml";
 }
 
+static const char *cgi_return_temp(int iIndex, int iNumParams, char *pcParam[], char *pcValue[])
+{
+    return "/temp.shtml";
+}
+
 static const tCGI cgi_handlers[] = {
   {
-    "/toggle_led",
-    cgi_toggle_led
-  },
-  {
-    "/reset_usb_boot",
-    cgi_reset_usb_boot
+    "/temp",
+    cgi_return_temp
   }
 };
 
@@ -56,7 +57,7 @@ void core1_entry()
     http_set_cgi_handlers(cgi_handlers, LWIP_ARRAYSIZE(cgi_handlers));
     http_set_ssi_handler(adc_ssi_handler, ssi_tags, LWIP_ARRAYSIZE(ssi_tags));
     
-    // For toggle_led
+    // For toggling the_LED
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
 

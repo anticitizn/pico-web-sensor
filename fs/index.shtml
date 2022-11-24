@@ -3,18 +3,31 @@
 <html>
 <head>
 <title>PicoWebSensor</title>
-<meta http-equiv="refresh" content ="1">
 </head>
+
 <style>
-table, th, td {
-  border:1px solid black;
-}
+  table, th, td {
+    border:1px solid black;
+  }
 </style>
 <body>
 
-<h2>Temperature sensor readout: <!--#adc --></h2>
+<h2>Temperature sensor readout: </h2><h2 id="tempReadout">0</h2>
 
-<p>This page refreshes every 1 second.</p>
+<script>
+  function reqListener() {
+    document.getElementById("tempReadout").textContent = this.responseText;
+  }
+
+  window.setInterval(function(){
+    let req = new XMLHttpRequest();
+    req.addEventListener("load", reqListener);
+    req.open("GET", "http://192.168.7.1/temp");
+    req.send();
+
+  }, 1000);
+  
+</script>
 
 </body>
 </html>
