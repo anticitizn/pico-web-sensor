@@ -34,7 +34,7 @@
         <h2 id="tempReadout">0</h2>
       </div>
       <div class="container-inline">
-        <button onclick="switchLed()">LED</button>
+        <button onclick="switchLed()">Toggle filter</button>
       </div>
     </div>
   </div>
@@ -48,7 +48,7 @@
   var points = []
 
   function switchLed() {
-    let req = new XMLHttpRequest();
+    var req = new XMLHttpRequest();
     req.open("GET", "http://192.168.7.1/led");
     req.send();
   }
@@ -91,17 +91,19 @@
 
   }
   function reqListener() {
+    var point = parseFloat(this.responseText).toFixed(1)
+
     if (points.length >= 60) {
       points.splice(0, 1)
     }
-    points.push(parseFloat(this.responseText))
+    points.push(point)
 
-    document.getElementById("tempReadout").textContent = this.responseText;
+    document.getElementById("tempReadout").textContent = point
     plotPoints()
   }
 
   window.setInterval(function(){
-    let req = new XMLHttpRequest();
+    var req = new XMLHttpRequest();
     req.addEventListener("load", reqListener);
     req.open("GET", "http://192.168.7.1/temp");
     req.send();

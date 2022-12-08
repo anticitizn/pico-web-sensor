@@ -12,7 +12,7 @@
 
 #define LED_PIN     25
 
-int temp = 0;
+float temp = 0;
 int moving_average = 0;
 
 // web server does some dynamic handling
@@ -41,7 +41,7 @@ static const tCGI cgi_handlers[] = {
 
 u16_t adc_ssi_handler(int iIndex, char *buf, int buflen, u16_t current_tag_number, u16_t *next_tag_number)
 {
-    sprintf(buf, "%d", temp);
+    sprintf(buf, "%f", temp);
     return strlen(buf);
 }
 
@@ -85,10 +85,25 @@ int main()
 
     const float conversion_factor = 3.3f / (1 << 12);
 
+    float temps[20] = {0};
+    int counter = 0;
     while (true)
     {
         uint16_t result = adc_read();
         temp = 100 * (result * conversion_factor) - 50;
+
+        temps[counter] = temp;
+        counter = (counter + 1) % 20;
+
+        if (moving_average)
+        {
+            float buf = 0;
+            for (int i = 0; i < 20; i++)
+            {
+                buf += temps[i];
+            }
+            temp = buf / 20;
+        }
 
         sleep_ms(10);
     }
