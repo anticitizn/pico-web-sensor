@@ -1,9 +1,11 @@
- #include <stdio.h>
+#include <stdio.h>
+
 #include "pico/stdlib.h"
 #include "pico/bootrom.h"
 #include "hardware/watchdog.h"
 #include "hardware/structs/watchdog.h"
 #include "hardware/adc.h"
+#include "hardware/gpio.h"
 #include "pico/multicore.h"
 
 #include "tusb_lwip_glue.h"
@@ -11,17 +13,13 @@
 #define LED_PIN     25
 
 int temp = 0;
+int moving_average = 0;
 
-// let our webserver do some dynamic handling
+// web server does some dynamic handling
 static const char *cgi_toggle_led(int iIndex, int iNumParams, char *pcParam[], char *pcValue[])
 {
     gpio_put(LED_PIN, !gpio_get(LED_PIN));
-    return "/index.shtml";
-}
-
-static const char *cgi_reset_usb_boot(int iIndex, int iNumParams, char *pcParam[], char *pcValue[])
-{
-    reset_usb_boot(0, 0);
+    moving_average = moving_average == 0 ? 1 : 0;
     return "/index.shtml";
 }
 
@@ -34,6 +32,10 @@ static const tCGI cgi_handlers[] = {
   {
     "/temp",
     cgi_return_temp
+  },
+  {
+    "/led",
+    cgi_toggle_led
   }
 };
 
@@ -73,19 +75,22 @@ int main()
 {
     multicore_launch_core1(core1_entry);
 
-    int LED_SENSOR = 26;
+    int TEMP_SENSOR = 26;
     
     stdio_init_all();
+    
     adc_init();
-    adc_gpio_init(LED_SENSOR);
+    adc_gpio_init(TEMP_SENSOR);
     adc_select_input(0);
 
     const float conversion_factor = 3.3f / (1 << 12);
+
     while (true)
     {
         uint16_t result = adc_read();
         temp = 100 * (result * conversion_factor) - 50;
-        sleep_ms(1000);
+
+        sleep_ms(10);
     }
 
     return 0;

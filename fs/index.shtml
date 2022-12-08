@@ -6,17 +6,98 @@
 </head>
 
 <style>
-  table, th, td {
-    border:1px solid black;
+  .container {
+    padding: 5px 20px;
+    margin: 20px;
+    display: block;
+  }
+
+  .container-inline {
+    padding: 5px 20px;
+    margin: 20px;
+    display: inline-block;
+  }
+
+  .plot {
+    border:2px solid #000000;
+    border-radius: 20px;
   }
 </style>
+
 <body>
 
-<h2>Temperature sensor readout: </h2><h2 id="tempReadout">0</h2>
+<div class="container-inline">
+  <div class="container" style="padding-top: 20px;">
+    <div class="container-inline">
+      <div class="container-inline">
+        <h2>Temperature </h2>
+        <h2 id="tempReadout">0</h2>
+      </div>
+      <div class="container-inline">
+        <button onclick="switchLed()">LED</button>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <canvas id="canvas_plot" class="plot" width="600" height="400"></canvas>
+  </div>
+</div>
+  
 
 <script>
+  var points = []
+
+  function switchLed() {
+    let req = new XMLHttpRequest();
+    req.open("GET", "http://192.168.7.1/led");
+    req.send();
+  }
+
+  function plotPoints() {
+    var c = document.getElementById("canvas_plot")
+    var ctx = c.getContext("2d")
+    ctx.clearRect(0, 0, 600, 400)
+    ctx.lineWidth = 2
+    ctx.strokeStyle = '#ff0000';
+
+    for (var i = 0; i < points.length - 1; i++) {
+      ctx.beginPath();
+      ctx.moveTo((i * 10) + 20, 800 - (points[i]*20))
+      ctx.lineTo(((i+1) * 10) + 20, 800 - (points[i+1]*20))
+      ctx.stroke()
+    }
+
+    var min = Math.min(...points)
+    var max = Math.max(...points)
+
+    
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 4
+
+    ctx.font = "16px Arial";
+    ctx.fillText(min, 0, (800 - min * 20) + 20); 
+    ctx.fillText(max, 0, (800 - max * 20) - 6); 
+
+
+    ctx.beginPath()
+    ctx.moveTo(0, 800 - min * 20)
+    ctx.lineTo(15, 800 - min * 20)
+    ctx.stroke()
+
+    ctx.beginPath()
+    ctx.moveTo(0, 800 - max * 20)
+    ctx.lineTo(15, 800 - max * 20)
+    ctx.stroke()
+
+  }
   function reqListener() {
+    if (points.length >= 60) {
+      points.splice(0, 1)
+    }
+    points.push(parseFloat(this.responseText))
+
     document.getElementById("tempReadout").textContent = this.responseText;
+    plotPoints()
   }
 
   window.setInterval(function(){
@@ -25,7 +106,7 @@
     req.open("GET", "http://192.168.7.1/temp");
     req.send();
 
-  }, 1000);
+  }, 100);
   
 </script>
 
