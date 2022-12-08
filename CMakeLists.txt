@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.13)
 set(PICO_TINYUSB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tinyusb)
 
 include(pico-sdk/pico_sdk_init.cmake)
-project(pico_webserver C CXX ASM)
+project(pico_websensor C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
@@ -23,7 +23,7 @@ set(TINYUSB_LIBNETWORKING_SOURCES
     ${PICO_TINYUSB_PATH}/lib/networking/rndis_reports.c
 )
 
-add_executable(${PROJECT_NAME} webserver.c tusb_lwip_glue.c usb_descriptors.c ${TINYUSB_LIBNETWORKING_SOURCES})
+add_executable(${PROJECT_NAME} main.c tusb_lwip_glue.c usb_descriptors.c ${TINYUSB_LIBNETWORKING_SOURCES})
 
 pico_enable_stdio_usb(${PROJECT_NAME} 0)
 pico_enable_stdio_uart(${PROJECT_NAME} 0)
