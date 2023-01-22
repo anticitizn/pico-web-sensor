@@ -13,5 +13,5 @@ git submodule update --init
 ./build.sh
 ```
 
-Copy `pico_websensor.uf2` into the Pico
-Web server is now available at `192.168.7.1`
+- Copy `pico_websensor.uf2` into the Pico
+- Web server is now available at `192.168.7.1`
