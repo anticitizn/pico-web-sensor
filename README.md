@@ -7,9 +7,8 @@ CMake version must be 3.13 or higher
 
 # Build instructions
 ```
-git clone --depth 1 https://github.com/anticitizn/pico-web-sensor.git
+git clone https://github.com/anticitizn/pico-web-sensor.git
 cd pico-web-sensor
-git submodule update --init
 ./build.sh
 ```
 
