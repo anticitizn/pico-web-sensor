@@ -108,7 +108,7 @@
     req.open("GET", "http://192.168.7.1/temp");
     req.send();
 
-  }, 100);
+  }, 10);
   
 </script>
 
