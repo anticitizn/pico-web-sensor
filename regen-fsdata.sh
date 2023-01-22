@@ -3,9 +3,9 @@
 if [ ! -f makefsdata ]; then
     # Doing this outside cmake as we don't want it cross-compiled but for host
     echo Compiling makefsdata
-    gcc -o makefsdata -Ilwip/src/include -I. lwip/src/apps/http/makefsdata/makefsdata.c
+    gcc -o src/makefsdata -Iexternal/lwip/src/include -Isrc/ -Iexternal/ -I. external/lwip/src/apps/http/makefsdata/makefsdata.c
 fi
 
 echo Regenerating fsdata.c
-./makefsdata 
+./src/makefsdata 
 echo Done

@@ -1,19 +1,22 @@
 cmake_minimum_required(VERSION 3.13)
 
-# We prefer to have all linked submodules at toplevel
-set(PICO_TINYUSB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tinyusb)
+set(PICO_TINYUSB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/tinyusb)
+set(PICO_SDK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/pico-sdk)
 
-include(pico-sdk/pico_sdk_init.cmake)
+include(external/pico-sdk/pico_sdk_init.cmake)
+
 project(pico_websensor C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
+
 pico_sdk_init()
 
 # LWIP
-set(LWIP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lwip)
+set(LWIP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/lwip)
 set (LWIP_INCLUDE_DIRS
     "${LWIP_DIR}/src/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 include(${LWIP_DIR}/src/Filelists.cmake)
 
@@ -23,7 +26,7 @@ set(TINYUSB_LIBNETWORKING_SOURCES
     ${PICO_TINYUSB_PATH}/lib/networking/rndis_reports.c
 )
 
-add_executable(${PROJECT_NAME} main.c tusb_lwip_glue.c usb_descriptors.c ${TINYUSB_LIBNETWORKING_SOURCES})
+add_executable(${PROJECT_NAME} main.c src/tusb_lwip_glue.c src/usb_descriptors.c ${TINYUSB_LIBNETWORKING_SOURCES})
 
 pico_enable_stdio_usb(${PROJECT_NAME} 0)
 pico_enable_stdio_uart(${PROJECT_NAME} 0)

@@ -8,7 +8,7 @@
 #include "hardware/gpio.h"
 #include "pico/multicore.h"
 
-#include "webserver.h"
+#include "src/webserver.h"
 
 #define LED_PIN 25
 
