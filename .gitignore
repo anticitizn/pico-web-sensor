@@ -1,4 +1,4 @@
 build
 makefsdata
 ./src/makefsdata
-./fsdata.c
+fsdata.c
