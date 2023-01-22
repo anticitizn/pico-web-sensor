@@ -9,11 +9,14 @@
 #include "pico/multicore.h"
 
 #include "src/webserver.h"
+#include "src/web_data.h"
 
 #define LED_PIN 25
 
 float temp = 0;
 int moving_average = 0;
+
+struct web_data data = {0, 0, 0, 0, 0, 0, 0};
 
 int main()
 {

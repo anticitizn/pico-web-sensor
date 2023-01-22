@@ -42,8 +42,9 @@
     <canvas id="canvas_plot" class="plot" width="600" height="400"></canvas>
   </div>
 </div>
-  
 
+<script src="jquery.js" type="text/javascript"></script>
+<script src="chart.js" type="text/javascript"></script>
 <script>
   var points = []
 
