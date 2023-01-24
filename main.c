@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #include "pico/stdlib.h"
 #include "pico/bootrom.h"
@@ -9,50 +10,42 @@
 #include "pico/multicore.h"
 
 #include "src/webserver.h"
-#include "src/web_data.h"
 
 #define LED_PIN 25
 
-float temp = 0;
-int moving_average = 0;
-
-struct web_data data = {0, 0, 0, 0, 0, 0, 0};
+float web_data[7] = {0};
 
 int main()
 {
+    set_sys_clock_khz(200000, true);
     multicore_launch_core1(core1_entry);
-
-    int TEMP_SENSOR = 26;
     
     stdio_init_all();
-    
-    adc_init();
-    adc_gpio_init(TEMP_SENSOR);
-    adc_select_input(0);
 
     const float conversion_factor = 3.3f / (1 << 12);
 
-    float temps[20] = {0};
-    int counter = 0;
     while (true)
     {
-        uint16_t result = adc_read();
-        temp = 100 * (result * conversion_factor) - 50;
-
-        temps[counter] = temp;
-        counter = (counter + 1) % 20;
-
-        if (moving_average)
+        for (int i = 0; i < 7; i++)
         {
-            float buf = 0;
-            for (int i = 0; i < 20; i++)
+            if (web_data[i] < (i+1) * 5000)
             {
-                buf += temps[i];
+                if (i < 4)
+                {
+                    web_data[i] += (i+1) * 10;
+                }
+                else
+                {
+                    web_data[i] += pow(i, i-3);
+                }
+                
             }
-            temp = buf / 20;
+            else
+            {
+                web_data[i] = 0;
+            }
+            sleep_ms(1);
         }
-
-        sleep_ms(10);
     }
 
     return 0;

@@ -27,47 +27,117 @@
 <body>
 
 <div class="container-inline">
-  <div class="container" style="padding-top: 20px;">
-    <div class="container-inline">
-      <div class="container-inline">
-        <h2>Temperature </h2>
-        <h2 id="tempReadout">0</h2>
-      </div>
-      <div class="container-inline">
-        <button onclick="switchLed()">Toggle filter</button>
-      </div>
-    </div>
-  </div>
-  <div class="container">
+  <div class="container-inline">
     <canvas id="canvas_plot" class="plot" width="800" height="600"></canvas>
+  </div>
+  <div class="container-inline">
+    <canvas id="latency_plot" class="plot" width="800" height="600"></canvas>
   </div>
 </div>
 
 <script src="jquery.js" type="text/javascript"></script>
 <script src="chart.js" type="text/javascript"></script>
 <script>
-  var points = [0, 0, 0]
+  var points = [[], [], [], [], [], [], []]
 
   const ctx = document.getElementById('canvas_plot');
+
+  var start_time = new Date().getTime();
+  var responseTimes = []
+
+  var sampleLabels = []
+  for (let i = 0; i < 60; i++)
+  {
+    sampleLabels.push(i)
+  }
 
   var myChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: points,
-      datasets: [{
-        label: 'temperature in Celsius',
-        data: points,
-        borderWidth: 1
-      }]
+      labels: sampleLabels,
+      datasets: [
+        {
+          label: 'x',
+          data: points[0],
+          borderWidth: 1
+        },
+        {
+          label: 'y',
+          data: points[1],
+          borderWidth: 1
+        },
+        {
+          label: 'z',
+          data: points[2],
+          borderWidth: 1
+        },
+        {
+          label: 'r_x',
+          data: points[3],
+          borderWidth: 1
+        },
+        {
+          label: 'r_y',
+          data: points[4],
+          borderWidth: 1
+        },
+        {
+          label: 'r_z',
+          data: points[5],
+          borderWidth: 1
+        },
+        {
+          label: 't',
+          data: points[6],
+          borderWidth: 1
+        },
+      ]
     },
     options: {
       animation: false,
       scales: {
         y: {
           min: 0,
-          max: 40
+          max: 40000
         }
-      }
+      },
+      plugins: {
+            legend: {
+              display: true,
+              reverse: true
+            }
+        }
+    }
+  });
+
+  const latency_ctx = document.getElementById('latency_plot');
+
+  var latencyChart = new Chart(latency_ctx, {
+    type: 'line',
+    data: {
+      labels: sampleLabels,
+      datasets: [
+        {
+          label: 'latency (ms)',
+          data: responseTimes,
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      animation: false,
+      scales: {
+        y: {
+          min: 0,
+          max: 100
+        }
+      },
+      plugins: {
+            legend: {
+              display: true,
+              reverse: true
+            }
+        }
     }
   });
 
@@ -79,17 +149,31 @@
 
   function plotPoints() {
     myChart.update()
+    latencyChart.update()
   }
 
   function reqListener() {
-    var point = parseFloat(this.responseText).toFixed(1)
-
-    if (points.length >= 60) {
-      points.splice(0, 1)
+    var latency = new Date().getTime() - start_time;
+    responseTimes.push(latency)
+    if (responseTimes.length > 60)
+    {
+      responseTimes.splice(0, 1)
     }
-    points.push(point)
 
-    document.getElementById("tempReadout").textContent = point
+    responseTimes.push()
+    var values = this.responseText.split(",")
+
+    for (let i = 0; i < 7; i++) {
+      if (points[i].length >= 60) {
+        points[i].splice(0, 1)
+      }
+    }
+
+    for (let i = 0; i < 7; i++) {
+      points[i].push(parseFloat(values[i]).toFixed(1))
+    }
+
+    //document.getElementById("tempReadout").textContent = parseFloat(values[6]).toFixed(1)
     plotPoints()
   }
 
@@ -97,6 +181,7 @@
     var req = new XMLHttpRequest();
     req.addEventListener("load", reqListener);
     req.open("GET", "http://192.168.7.1/temp");
+    start_time = new Date().getTime();
     req.send();
 
   }, 10);
